@@ -1,2 +1,4 @@
 ConvertedNHK.xml
 DownloadedJSON.json
+.vscode
+.mypy_cache
