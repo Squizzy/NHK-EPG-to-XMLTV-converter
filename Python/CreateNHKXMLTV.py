@@ -10,7 +10,7 @@ __maintainer__ = "Squizzy"
 import json
 from datetime import datetime, timezone
 import xml.etree.ElementTree as xml
-import requests
+import requests # type: ignore
 import sys
 
 
