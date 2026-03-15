@@ -6,6 +6,8 @@ __credits__ = "The respective websites, and whoever took time to share informati
 __license__ = "GPLv2"
 __version__ = "1.5" # Python-3 only
 __maintainer__ = "Squizzy"
+__contributors__ = ["TheDreadPirate"] # TheDreadPirate: https://github.com/solidsnake1298
+
 
 import json
 from datetime import datetime, timezone
