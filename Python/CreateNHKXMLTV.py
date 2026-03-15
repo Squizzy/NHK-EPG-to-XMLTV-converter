@@ -23,13 +23,22 @@ XMLTV_SOURCE_INFO_URL:str = "https://github.com/Squizzy/NHK-EPG-to-XMLTV-convert
 
 # Location of the NHK EPG JSON to be downloaded.
 # This might need occastional updating
-URL_OF_NHK_JSON: str = "https://nwapi.nhk.jp/nhkworld/epg/v7b/world/all.json"
+# OBSOLETE: URL_OF_NHK_JSON:str = "https://nwapi.nhk.jp/nhkworld/epg/v7b/world/all.json"
+URL_OF_NHK_JSON:str = ""
+
+# Location of the NHK EPG URL at which the JSON can be found
+# the daily EPG is now at the location below, with the json named "%Y%m%d".json
+# up to 28-days EPG appears to be provided, and back in time quite far
+URL_OF_NHK_JSON_ROOT: str = "https://masterpl.hls.nhkworld.jp/epg"
+URL_OF_NHK_JSON_ROOT_EN: str = f"{URL_OF_NHK_JSON_ROOT}/w"
+URL_OF_NHK_JSON_ROOT_JP: str = f"{URL_OF_NHK_JSON_ROOT}/wp"
 
 # Location of the NHK streams for use in the XMLTV
-URL_OF_NHK_ROOT: str = "https://www3.nhk.or.jp"
+URL_OF_NHK_JAPAN:str = "https://www3.nhk.or.jp" # Japanese website
+URL_OF_NHK_WORLD:str = f"{URL_OF_NHK_JAPAN}/nhkworld" # World website
 
 # Location of the NHK channel icon
-URL_OF_NHK_CHANNEL_ICON: str = URL_OF_NHK_ROOT + "nhkworld/assets/images/icon_nhkworld_tv.png"
+URL_OF_NHK_CHANNEL_ICON:str = f"{URL_OF_NHK_JAPAN}/nhkworld/assets/images/icon_nhkworld_tv.png"
 
 # Name of the file that is created by this application 
 # which contains the XMLTV XML of the NHK EPG
