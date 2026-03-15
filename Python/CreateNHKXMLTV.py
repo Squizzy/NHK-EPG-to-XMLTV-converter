@@ -44,19 +44,19 @@ URL_OF_NHK_CHANNEL_ICON:str = f"{URL_OF_NHK_JAPAN}/nhkworld/assets/images/icon_n
 
 # Name of the file that is created by this application 
 # which contains the XMLTV XML of the NHK EPG
-XMLTV_XML_FILE: str = 'ConvertedNHK.xml'
+XMLTV_XML_FILE:str = 'ConvertedNHK.xml'
 
 # Downloaded JSON file for tests, or created when DEBUG is on
-DEBUG: bool = False
-TEST_NHK_JSON: str = 'DownloadedJSON.json'
+DEBUG:bool = False
+TEST_NHK_JSON:str = 'DownloadedJSON.json'
 
 # Local time zone that will be used for the timestamps in the XMLTV file
 # Currently set for UTC as for Continental European use
-TIMEZONE: timezone = timezone.utc
+TIMEZONE:timezone = timezone.utc
 
 # In case the time offset is incorrect in the XMLTV file, the value below 
 # can be modified to adjust it: For example -0100 would change to -1 UTC
-TIME_OFFSET: str = ' +0000'
+TIME_OFFSET:str = ' +0000'
 
 
 # Genres from NHK network
@@ -70,7 +70,7 @@ TIME_OFFSET: str = ' +0000'
 # Genres are called "category" in XMLTV
 # These should not change too often but can be updated
 # by the output of the scrapping tool Scrape_nhk_Genres.py
-GENRES: dict[int|None, str] = {
+GENRES:dict[int|None, str] = {
           None: "General",
           11: "News",
           12: "Current Affairs",
@@ -188,7 +188,7 @@ def Add_xml_element(parent:xml.Element, tag:str, attributes:dict[str,str]|None =
     Returns:
         xml.Element: the XML node created
     """
-    element: xml.Element = xml.SubElement(parent, tag)
+    element:xml.Element = xml.SubElement(parent, tag)
     if attributes:
         for key, value in attributes.items():
             element.set(key, value)
