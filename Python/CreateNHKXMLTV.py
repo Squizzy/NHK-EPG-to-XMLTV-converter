@@ -95,32 +95,43 @@ GENRES: dict[int|None, str] = {
 
 
 # Import the .json from the URL
-def Import_nhk_epg_json(JsonIn: str) -> dict:
+def import_nhk_epg_json(json_url:str = "") -> dict:
     """Downloads the NHK EPG JSON data from the specified URL and loads it into a variable.
     Args:
         JsonInURL (str): URL to download the NHK EPG JSON data.
     """
-        
-    response: requests.Response = requests.get(url = JsonIn)
+    if not json_url or json_url == "":
+        raise ValueError("No URL provided for the EPG JSON. Aborting")
     
-    if response.status_code == 200:
-        try:
-            data: dict = response.json()
-        except requests.exceptions.JSONDecodeError:
-            print("problem with the parsing of the JSON file downloaded from NHK")
+    response: requests.Response = requests.get(url = json_url)
+    
+    match response.status_code:
+        case 200:
+            try:
+                data: dict = response.json()
+            except requests.exceptions.JSONDecodeError:
+                print("problem with the parsing of the JSON file downloaded from NHK")
+                sys.exit(1)
+            except Exception as e:
+                print(f"problem recovering the JSON data from the website data: {e}")
+    
+        case 404:
+            print(f"Network error {response.status_code}: \n \
+                    The NHK file containing the EPG JSON does not exist at the URL provided.\n \
+                    Aborting.")
+            sys.exit(1)
+        
+        case 403:
+            print(f"Network error {response.status_code}: \n \
+                    The NHK EPG JSON file exists but NHK rejects the request.\n \
+                    Try again later, aborting")
             sys.exit(1)
     
-    elif response.status_code == 404:
-        print(f"Network error {response.status_code}: The NHK file containing the EPG JSON does not exist at the URL provided")
-        sys.exit(1)
-        
-    elif response.status_code == 403:
-        print(f"Network error {response.status_code}: The NHK EPG JSON file exists but NHK rejects the request - try again later")
-        sys.exit(1)
-    
-    else:
-        print(f"Network error {response.status_code}: Problem with the URL to the NHK JSON file provided")
-        sys.exit(1)
+        case _:
+            print(f"Network error {response.status_code}: \n \
+                    Problem with the URL to the NHK JSON file provided.\n \
+                    Aborting")
+            sys.exit(1)
     
     print("NHK World EPG JSON file downloaded successfully")
     
