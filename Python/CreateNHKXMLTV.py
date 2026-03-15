@@ -12,6 +12,13 @@ from datetime import datetime, timezone
 import xml.etree.ElementTree as xml
 import requests # type: ignore
 import sys
+# from pprint import pprint
+from icecream import ic
+# from NHK_json_dataclasses import JSONProgramDetails
+
+
+XMLTV_SOURCE_INFO_NAME:str = "NHK-EPG-to-XMLTV-converter by Squizzy"
+XMLTV_SOURCE_INFO_URL:str = "https://github.com/Squizzy/NHK-EPG-to-XMLTV-converter"
 
 
 # Location of the NHK EPG JSON to be downloaded.
