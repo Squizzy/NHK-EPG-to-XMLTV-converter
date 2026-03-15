@@ -138,17 +138,45 @@ def import_nhk_epg_json(json_url:str = "") -> dict:
     return data
 
 
-def Convert_unix_to_xmltv_date(unixTime: str) -> str:
-    """ Converts the unit time from NHK to XMLTV time format
+def json_to_xmltv_datetime(json_datetime: str) -> str:
+    """ Converts date/time from the NHK EPG JSON to XMLTV time format
     Args:
-        u (str): Unix time in milliseconds as a string
+        json_datetime (str): the date/time provided as a string in the EPG JSON downloaded
     Returns:
-        str: Returns the date in XMLTV format required for applications like Kodi.
-    """    
-    return datetime.fromtimestamp(int(unixTime[:-3]), tz = TIMEZONE).strftime('%Y%m%d%H%M%S')
+        str: the date/time in XMLTV format.
+    """
+    try:
+        json_datetime_details = datetime.strptime(json_datetime, '%Y-%m-%dT%H:%M:%S%z')
+        xmltv_datetime=json_datetime_details.strftime('%Y%m%d%H%M%S')
+        
+    except Exception as e:
+        print(f"Error converting the json date and time ({json_datetime}) to xmltv format. Aborting.")
+        exit(1)
+        
+    return xmltv_datetime
 
 
-def Add_xml_element(parent: xml.Element, tag: str, attributes:dict[str,str]|None=None, text:str|None=None) -> xml.Element:
+def duration_in_mins(json_start_time:str, json_end_time:str) -> int:
+    """ Calculate the duration of a programme, given the start and then time
+    Args:
+        json_start_time, json_end_time (str): start and end as provided by the NHK EPG JSON
+    Returns:
+        (int): the duration in minutes
+    """
+    duration:int = 0
+    
+    try:
+        start_time = datetime.strptime(json_start_time, '%Y-%m-%dT%H:%M:%S%z')
+        end_time = datetime.strptime(json_end_time, '%Y-%m-%dT%H:%M:%S%z')
+        duration = int(abs((end_time - start_time).seconds / 60))
+        
+    except Exception as e:
+        print(f"Error converting the json date and time ({start_time} or {end_time}) to calculate the duration. skipping.")
+        
+    return duration
+    
+
+def Add_xml_element(parent:xml.Element, tag:str, attributes:dict[str,str]|None = None, text:str|None = None) -> xml.Element:
     """ Add an XML element to a tree
     Args:
         parent (xml.Element): The parent node in the XML tree
