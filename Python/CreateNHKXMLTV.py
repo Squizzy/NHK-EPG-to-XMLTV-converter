@@ -369,23 +369,23 @@ def Generate_xmltv_xml(nhkimported: dict) -> xml.Element:
     Add_xml_element(channel, 'icon', attributes={'src': URL_OF_NHK_CHANNEL_ICON})
 
     # Go through all items, though only interested in the Programmes information here
-    for item in nhkimported["channel"]["item"]:
+    for programme_to_add in nhkimported["channel"]["programme_to_add"]:
 
         # construct the program info xml tree
         programme: xml.Element = Add_xml_element(
                                     root, 
                                     'programme', 
-                                    attributes={'start': Convert_unix_to_xmltv_date(item["pubDate"]) + TIME_OFFSET, 
-                                                'stop': Convert_unix_to_xmltv_date(item["endDate"]) + TIME_OFFSET, 
+                                    attributes={'start': json_to_xmltv_datetime(programme_to_add["pubDate"]) + TIME_OFFSET, 
+                                                'stop': json_to_xmltv_datetime(programme_to_add["endDate"]) + TIME_OFFSET, 
                                                 'channel':'nhk.world'})
 
-        Add_xml_element(programme, 'title', attributes={'lang': 'en'}, text=item["title"])
-        Add_xml_element(programme, 'sub-title', attributes={'lang': 'en'}, text=item["subtitle"] if item["subtitle"] else item["airingId"])
-        Add_xml_element(programme, 'desc', attributes={'lang': 'en'}, text=item["description"])
-        Add_xml_element(programme, 'episode-num', text=item["airingId"])
-        Add_xml_element(programme, 'icon', attributes={'src': URL_OF_NHK_ROOT + item["thumbnail"]})
+        Add_xml_element(programme, 'title', attributes={'lang': 'en'}, text=programme_to_add["title"])
+        Add_xml_element(programme, 'sub-title', attributes={'lang': 'en'}, text=programme_to_add["subtitle"] if programme_to_add["subtitle"] else programme_to_add["airingId"])
+        Add_xml_element(programme, 'desc', attributes={'lang': 'en'}, text=programme_to_add["description"])
+        Add_xml_element(programme, 'episode-num', text=programme_to_add["airingId"])
+        Add_xml_element(programme, 'icon', attributes={'src': URL_OF_NHK_JAPAN + programme_to_add["thumbnail"]})
 
-        genre: str = item["genre"]["TV"]
+        genre: str = programme_to_add["genre"]["TV"]
         category1: str = ""
         category2: str = ""
         if genre == "":
@@ -402,7 +402,7 @@ def Generate_xmltv_xml(nhkimported: dict) -> xml.Element:
         
         if category2 != "":
             Add_xml_element(programme, 'category', attributes={'lang': 'en'}, text=category2)
-        
+    
     if not Xml_beautify(root):
         print("Problem beautifying the XML")
         sys.exit(1)
