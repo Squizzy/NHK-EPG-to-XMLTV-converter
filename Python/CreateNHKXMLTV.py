@@ -503,11 +503,13 @@ def main(duration_selection:int|None = None, lang:str = 'en') -> int:
         epg_date_json_data_list = import_nhk_epg_json(URL_OF_NHK_JSON)["data"]
         
             
-        # load the json file from local storage
-        with open(TEST_NHK_JSON, 'r', encoding='utf8') as nhkjson:
-            json_data = json.load(nhkjson)    
-
-    XmltvXml: xml.Element = Generate_xmltv_xml(json_data)
+        # Generate the XMLTV programmes list for this day
+        count = 0
+        for programme in epg_date_json_data_list:
+            nhk_xmltv = generate_xmltv_xml_programme(root=nhk_xmltv, programme_to_add=programme, lang=lang)
+            count += 1
+        print(f"{epg_date}: {count} / {len(epg_date_json_data_list)} programmes added.")
+                
     
     # Save_xmltv_xml_to_file(XmltvXml)
     if not save_xmltv_xml_to_file(nhk_xmltv):
