@@ -172,9 +172,9 @@ def duration_in_mins(json_start_time:str, json_end_time:str) -> int:
     duration:int = 0
     
     try:
-        start_time = datetime.strptime(json_start_time, '%Y-%m-%dT%H:%M:%S%z')
-        end_time = datetime.strptime(json_end_time, '%Y-%m-%dT%H:%M:%S%z')
-        duration = int(abs((end_time - start_time).seconds / 60))
+        start_time = datetime.strptime(json_start_time, '%Y-%m-%dT%H:%M:%S%z').timestamp()
+        end_time = datetime.strptime(json_end_time, '%Y-%m-%dT%H:%M:%S%z').timestamp()
+        duration = abs(int((end_time - start_time)/60))
         
     except Exception as e:
         print(f"Error converting the json date and time ({start_time} or {end_time}) to calculate the duration. skipping.")
