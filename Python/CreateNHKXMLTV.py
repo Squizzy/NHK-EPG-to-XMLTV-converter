@@ -12,14 +12,12 @@ __contributors__ = ["TheDreadPirate"] # TheDreadPirate: https://github.com/solid
 import argparse
 import json
 from datetime import datetime, timezone, timedelta
-import xml.etree.ElementTree as xml
-from xml.etree import ElementTree
+import xml.etree.ElementTree as xml  # from xml.etree import ElementTree
 import requests
 import sys
 from pathlib import Path
 # from pprint import pprint
 from icecream import ic
-# from NHK_json_dataclasses import JSONProgramDetails
 
 
 # Will save the downloaded JSON info if enabled, as {DEBUG_FOLDER}/{TEST_NHK_JSON}_<epg_date>_<language>.json
@@ -104,7 +102,9 @@ GENRES:dict[int|None, str] = {
 def import_nhk_epg_json(json_url:str = "") -> dict:
     """Downloads the NHK EPG JSON data from the specified URL and loads it into a variable.
     Args:
-        JsonInURL (str): URL to download the NHK EPG JSON data.
+        json_url(str): URL to download the NHK EPG JSON data.
+    Returns:
+        (dict): the downloaded json parsed as a dict
     """
     if not json_url or json_url == "":
         raise ValueError("No URL provided for the EPG JSON. Aborting")
@@ -182,7 +182,7 @@ def duration_in_mins(json_start_time:str, json_end_time:str) -> int:
     return duration
     
 
-def Add_xml_element(parent:xml.Element, tag:str, attributes:dict[str,str]|None = None, text:str|None = None) -> xml.Element:
+def add_xml_element(parent:xml.Element, tag:str, attributes:dict[str,str]|None = None, text:str|None = None) -> xml.Element:
     """ Add an XML element to a tree
     Args:
         parent (xml.Element): The parent node in the XML tree
@@ -201,7 +201,7 @@ def Add_xml_element(parent:xml.Element, tag:str, attributes:dict[str,str]|None =
     return element
 
 
-def Xml_beautify(elem:xml.Element, level:int=0) -> bool:
+def xml_beautify(elem:xml.Element, level:int=0) -> None:
     """ indent: beautify the xml to be output, rather than having it stay on one line
         Origin: http://effbot.org/zone/element-lib.htm#prettyprint """
     i:str = "\n" + level * "\t"
@@ -211,7 +211,7 @@ def Xml_beautify(elem:xml.Element, level:int=0) -> bool:
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
         for elem in elem:
-            Xml_beautify(elem, level + 1)
+            xml_beautify(elem, level + 1)
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
     else:
@@ -219,8 +219,6 @@ def Xml_beautify(elem:xml.Element, level:int=0) -> bool:
             elem.tail = i
     return True
 
-
-# def generate_xmltv_xml.header() ->
 
 def generate_xmltv_xml_root() -> xml.Element:
     """ Generates the root of the XMLTV document 
@@ -251,20 +249,20 @@ def generate_xmltv_xml_channel(root:xml.Element) -> xml.Element:
         print("No root xml element provided to generate the xmltv. Aborting")
         exit(1)
     
-    channel:xml.Element = Add_xml_element(parent=root, 
+    channel:xml.Element = add_xml_element(parent=root, 
                                           tag='channel', 
                                           attributes={'id': 'nhk-world'})
     
-    Add_xml_element(parent=channel,
+    add_xml_element(parent=channel,
                     tag='display-name',
                     attributes={'lang': 'en'},
                     text='NHK World')
     
-    Add_xml_element(parent=channel, 
+    add_xml_element(parent=channel, 
                     tag='icon',
                     attributes={'src': URL_OF_NHK_CHANNEL_ICON})
     
-    Add_xml_element(parent=channel, 
+    add_xml_element(parent=channel, 
                     tag='url', 
                     text=URL_OF_NHK_WORLD)
 
@@ -275,6 +273,8 @@ def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}, l
     """ Generates a program for the programs list to add to the root of the XMLTV document 
     Args:
         root (xml.Element): the root to which to add the program
+        programme_to_add (dict): the XML of the individual program to add to the root
+        lang (str): The language of the EPG (jp or en (default))
     Returns:
         (xml.Element): the root document with the added program
     """
@@ -287,45 +287,47 @@ def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}, l
         return root
     
     # construct the program info xml tree
-    programme:xml.Element = Add_xml_element(
+    programme:xml.Element = add_xml_element(
                                 parent=root, 
                                 tag='programme', 
                                 attributes={'start': json_to_xmltv_datetime(programme_to_add["startTime"]) + TIME_OFFSET,
                                             'stop' : json_to_xmltv_datetime(programme_to_add["endTime"]) + TIME_OFFSET,
                                             'channel':'nhk-world'})
 
-    Add_xml_element(parent=programme, 
+    add_xml_element(parent=programme, 
                     tag='title', 
                     attributes={'lang': 'en'}, 
                     text=programme_to_add["title"])
     
-    Add_xml_element(parent=programme, 
+    add_xml_element(parent=programme, 
                     tag='sub-title', 
                     attributes={'lang': 'en'}, 
                     text=programme_to_add["episodeTitle"])
     
-    Add_xml_element(parent=programme, 
+    add_xml_element(parent=programme, 
                     tag='desc', 
                     attributes={'lang': 'en'}, 
                     text=programme_to_add["description"])
     
-    Add_xml_element(parent=programme, 
+    add_xml_element(parent=programme, 
                     tag='episode-num',              
                     attributes={'system': 'onscreen'}, 
                     text=programme_to_add["episodeId"][-3:])
     
-    Add_xml_element(parent=programme, 
+    add_xml_element(parent=programme, 
                     tag='icon', 
                     attributes={'src': programme_to_add["episodeThumbnailURL"],
                                 # "width": "100",  # if needed 
                                 # "height": "100"  # if needed
                                 })
 
-    Add_xml_element(parent=programme,
+    add_xml_element(parent=programme,
                     tag="length",
                     attributes={"units":"minutes"},
                     text=str(duration_in_mins(programme_to_add['endTime'], programme_to_add['startTime']))
                     )
+
+    # Below left in case NHK EPG genres become available again
 
     # Genre description has changed, hiding until more info available to use the categories again
     # genre: str = programme_to_add["genre"]["TV"]
@@ -344,19 +346,16 @@ def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}, l
     # Add_xml_element(programme, 'category', attributes={'lang': 'en'}, text=category1)
     
     # if category2 != "":
-    #     Add_xml_element(programme, 'category', attributes={'lang': 'en'}, text=category2)
- 
-    
+    #     Add_xml_element(programme, 'category', attributes={'lang': lang}, text=category2)
+  
     return root
 
 
-
 def Generate_xmltv_xml(nhkimported: dict) -> xml.Element:
-    """Generates the XMLTV XML tree from the NHK JSON EPG data
-
+    """ SUPERSEDED
+    Generates the XMLTV XML tree from the NHK JSON EPG data
     Args:
-        nhkimported (JSON): The NHK JSON data to be converted to XMLTV XML
-        
+        nhkimported (dict): The NHK JSON data to be converted to XMLTV XML
     Returns:
         root (xml.tree): the XML tree created
     """
@@ -368,26 +367,26 @@ def Generate_xmltv_xml(nhkimported: dict) -> xml.Element:
                                 'source-info-name': 'NHK World EPG Json', 
                                 'source-info-url': 'https://www3.nhk.or.jp/nhkworld/'})
 
-    channel = Add_xml_element(root, 'channel', attributes={'id': 'nhk.world'})
-    Add_xml_element(channel, 'display-name', text='NHK World')
-    Add_xml_element(channel, 'icon', attributes={'src': URL_OF_NHK_CHANNEL_ICON})
+    channel = add_xml_element(root, 'channel', attributes={'id': 'nhk.world'})
+    add_xml_element(channel, 'display-name', text='NHK World')
+    add_xml_element(channel, 'icon', attributes={'src': URL_OF_NHK_CHANNEL_ICON})
 
     # Go through all items, though only interested in the Programmes information here
     for programme_to_add in nhkimported["channel"]["programme_to_add"]:
 
         # construct the program info xml tree
-        programme: xml.Element = Add_xml_element(
+        programme: xml.Element = add_xml_element(
                                     root, 
                                     'programme', 
                                     attributes={'start': json_to_xmltv_datetime(programme_to_add["pubDate"]) + TIME_OFFSET, 
                                                 'stop': json_to_xmltv_datetime(programme_to_add["endDate"]) + TIME_OFFSET, 
                                                 'channel':'nhk.world'})
 
-        Add_xml_element(programme, 'title', attributes={'lang': 'en'}, text=programme_to_add["title"])
-        Add_xml_element(programme, 'sub-title', attributes={'lang': 'en'}, text=programme_to_add["subtitle"] if programme_to_add["subtitle"] else programme_to_add["airingId"])
-        Add_xml_element(programme, 'desc', attributes={'lang': 'en'}, text=programme_to_add["description"])
-        Add_xml_element(programme, 'episode-num', text=programme_to_add["airingId"])
-        Add_xml_element(programme, 'icon', attributes={'src': URL_OF_NHK_JAPAN + programme_to_add["thumbnail"]})
+        add_xml_element(programme, 'title', attributes={'lang': 'en'}, text=programme_to_add["title"])
+        add_xml_element(programme, 'sub-title', attributes={'lang': 'en'}, text=programme_to_add["subtitle"] if programme_to_add["subtitle"] else programme_to_add["airingId"])
+        add_xml_element(programme, 'desc', attributes={'lang': 'en'}, text=programme_to_add["description"])
+        add_xml_element(programme, 'episode-num', text=programme_to_add["airingId"])
+        add_xml_element(programme, 'icon', attributes={'src': URL_OF_NHK_JAPAN + programme_to_add["thumbnail"]})
 
         genre: str = programme_to_add["genre"]["TV"]
         category1: str = ""
@@ -402,10 +401,10 @@ def Generate_xmltv_xml(nhkimported: dict) -> xml.Element:
         else:
             category1 = GENRES[None]
 
-        Add_xml_element(programme, 'category', attributes={'lang': 'en'}, text=category1)
+        add_xml_element(programme, 'category', attributes={'lang': 'en'}, text=category1)
         
         if category2 != "":
-            Add_xml_element(programme, 'category', attributes={'lang': 'en'}, text=category2)
+            add_xml_element(programme, 'category', attributes={'lang': 'en'}, text=category2)
     
     if not Xml_beautify(root):
         print("Problem beautifying the XML")
@@ -418,18 +417,21 @@ def Generate_xmltv_xml(nhkimported: dict) -> xml.Element:
 
 def save_xmltv_xml_to_file(root: xml.Element) -> bool:
     """Store the XML tree to a file
-
     Args:
-        root (_type_): The XMLTV XML tree to store to file
+        root (xml.Element): The XMLTV XML tree to store to file
+    Returns:
+        (bool): True if the XMLTV file has been created and populated.
     """
     # Export the xml to a local file
     tree:xml.ElementTree = xml.ElementTree(root)
+    
     try:
         with open(XMLTV_XML_FILE, 'w+b') as outFile:
             tree.write(outFile)
     
         print(f"{XMLTV_XML_FILE} created successfully")
         return True
+    
     except IOError as e:
         print(f"Error writing XMLTV file {XMLTV_XML_FILE}: {e}")
         return False
@@ -438,15 +440,19 @@ def save_xmltv_xml_to_file(root: xml.Element) -> bool:
 def get_number_of_days(duration_selection:int|None = None) -> int:
     """ Determines the number of days of EPG (from today) for the xmltv file 
     Args:
-        argv (list[str]): the args passed in command line, if any
+        duration_selection (int|None): the duration passed as an arg in command line, if any
     Returns:
-        (int|list[int])
+        (int): the selected number of days
     """
     number_of_days_options:dict[int, int] = {0: 0, 1: 1, 2: 2, 3: 7, 4: 14, 5: 28}
+    
     choice:int = -1
+    
+    # If a choice has been used as an argument when calling the app, use it 
     if duration_selection:
         choice = duration_selection
     
+    # Loop until an allowable choice has been made
     while choice not in number_of_days_options.keys():
         try:
             choice = int(input("Select: 1 [one day (today)],  2 [two days], 3 [one week], 4 [two weeks], 5 [4 weeks], 0 [exit]: "))
@@ -458,8 +464,11 @@ def get_number_of_days(duration_selection:int|None = None) -> int:
 
 def main(duration_selection:int|None = None, lang:str = 'en') -> int:
     """Main application
+    Args:
+        duration_selection (int|None): the duration passed as an arg in command line, if any
+        lang (str): the language of the EPG to download ('en' or 'jp) passed as an arg in command line, if any, else 'en'
     Returns:
-        0: Successful execution
+        (int): 0 (Successful generation of the XMLTV file) or 1 (failure)
     """
     nhk_xmltv:xml.Element 
     
@@ -468,6 +477,7 @@ def main(duration_selection:int|None = None, lang:str = 'en') -> int:
         print("incorrect language selected, defaulting to english")
         lang='en'
 
+    # get the number of days, either from the command line argument or from interactive request
     number_of_days:int = get_number_of_days(duration_selection=duration_selection)
 
     # should never happen, but safety first...
@@ -519,30 +529,11 @@ def main(duration_selection:int|None = None, lang:str = 'en') -> int:
             nhk_xmltv = generate_xmltv_xml_programme(root=nhk_xmltv, programme_to_add=programme, lang=lang)
             count += 1
         print(f"{epg_date}: {count} / {len(epg_date_json_data_list)} programmes added.")
-                
-        # ic(json_data)
-    # ic(ElementTree.dump(root))
-    # exit(0)
     
-    # URL_OF_NHK_JSON:str = URL_OF_NHK_JSON_ROOT_EN + datetime.strftime(datetime.now(), "%Y%m%d") + '.json'
-    
-    # print(URL_OF_NHK_JSON)
-    # exit(0)
-    
-    # json_data: dict = import_nhk_epg_json(URL_OF_NHK_JSON)
-    
-    # if DEBUG:
-    #     with open(TEST_NHK_JSON, 'w', encoding="utf-8") as jsonfile:
-    #         json.dump(json_data, jsonfile)
-            
-    #     # load the json file from local storage
-    #     with open(TEST_NHK_JSON, 'r', encoding='utf8') as nhkjson:
-    #         json_data = json.load(nhkjson)    
+    # Prepare a beautified version of the XMLTV (aesthetics only)
+    xml_beautify(nhk_xmltv)
 
-    # exit(0)
-    # XmltvXml: xml.Element = Generate_xmltv_xml(json_data)
-    
-    # Save_xmltv_xml_to_file(XmltvXml)
+    # Attempt to save the XMLTV file to disk
     if not save_xmltv_xml_to_file(nhk_xmltv):
         print("Creation of the XMLTV file failed at saving the file")
         return 1
