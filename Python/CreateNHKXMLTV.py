@@ -456,11 +456,29 @@ def get_number_of_days(duration_selection:int|None = None) -> int:
     return number_of_days_options[choice]
 
 
+def main(duration_selection:int|None = None, lang:str = 'en') -> int:
     """Main application
     Returns:
         0: Successful execution
     """
     nhk_xmltv:xml.Element 
+    
+    # should never happen, but safety first...
+    if lang not in ['en', 'jp']:
+        print("incorrect language selected, defaulting to english")
+        lang='en'
+
+    number_of_days:int = get_number_of_days(duration_selection=duration_selection)
+
+    # should never happen, but safety first...
+    if number_of_days not in [0, 1, 2, 7, 14, 28]:
+        print("incorrect number of days provided, defaulting to 1")
+        number_of_days = 1
+        
+    if number_of_days == 0:
+        print("Exit selected")
+        exit(0)
+        
     # Generate the root
     nhk_xmltv = generate_xmltv_xml_root()
     
