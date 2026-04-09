@@ -295,17 +295,17 @@ def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}, l
 
     add_xml_element(parent=programme, 
                     tag='title', 
-                    attributes={'lang': 'en'}, 
+                    attributes={'lang': lang}, 
                     text=programme_to_add["title"])
     
     add_xml_element(parent=programme, 
                     tag='sub-title', 
-                    attributes={'lang': 'en'}, 
+                    attributes={'lang': lang}, 
                     text=programme_to_add["episodeTitle"])
     
     add_xml_element(parent=programme, 
                     tag='desc', 
-                    attributes={'lang': 'en'}, 
+                    attributes={'lang': lang}, 
                     text=programme_to_add["description"])
     
     add_xml_element(parent=programme, 
@@ -342,7 +342,7 @@ def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}, l
     # else:
     #     category1 = GENRES[None]
 
-    # Add_xml_element(programme, 'category', attributes={'lang': 'en'}, text=category1)
+    # Add_xml_element(programme, 'category', attributes={'lang': lang}, text=category1)
     
     # if category2 != "":
     #     Add_xml_element(programme, 'category', attributes={'lang': lang}, text=category2)
