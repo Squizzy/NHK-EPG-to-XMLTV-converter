@@ -217,7 +217,6 @@ def xml_beautify(elem:xml.Element, level:int=0) -> None:
     else:
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
-    return True
 
 
 def generate_xmltv_xml_root() -> xml.Element:
@@ -406,9 +405,7 @@ def Generate_xmltv_xml(nhkimported: dict) -> xml.Element:
         if category2 != "":
             add_xml_element(programme, 'category', attributes={'lang': 'en'}, text=category2)
     
-    if not Xml_beautify(root):
-        print("Problem beautifying the XML")
-        sys.exit(1)
+    xml_beautify(root)
     
     print("NHK WORLD EPG data converted to XMLTV standard")
     
