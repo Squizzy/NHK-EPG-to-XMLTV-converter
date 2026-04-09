@@ -520,6 +520,27 @@ def main(duration_selection:int|None = None, lang:str = 'en') -> int:
             count += 1
         print(f"{epg_date}: {count} / {len(epg_date_json_data_list)} programmes added.")
                 
+        # ic(json_data)
+    # ic(ElementTree.dump(root))
+    # exit(0)
+    
+    # URL_OF_NHK_JSON:str = URL_OF_NHK_JSON_ROOT_EN + datetime.strftime(datetime.now(), "%Y%m%d") + '.json'
+    
+    # print(URL_OF_NHK_JSON)
+    # exit(0)
+    
+    # json_data: dict = import_nhk_epg_json(URL_OF_NHK_JSON)
+    
+    # if DEBUG:
+    #     with open(TEST_NHK_JSON, 'w', encoding="utf-8") as jsonfile:
+    #         json.dump(json_data, jsonfile)
+            
+    #     # load the json file from local storage
+    #     with open(TEST_NHK_JSON, 'r', encoding='utf8') as nhkjson:
+    #         json_data = json.load(nhkjson)    
+
+    # exit(0)
+    # XmltvXml: xml.Element = Generate_xmltv_xml(json_data)
     
     # Save_xmltv_xml_to_file(XmltvXml)
     if not save_xmltv_xml_to_file(nhk_xmltv):
