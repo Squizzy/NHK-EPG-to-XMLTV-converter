@@ -4,7 +4,7 @@ __copyright__ = "Copyright 2019-now, Squizzy"
 __credits__ = "The respective websites, and whoever took time to share information\
                  on how to use Python and modules"
 __license__ = "GPLv2"
-__version__ = "1.5" # Python-3 only
+__version__ = "2.0" # Python-3 only
 __maintainer__ = "Squizzy"
 __contributors__ = ["TheDreadPirate"] # TheDreadPirate: https://github.com/solidsnake1298
 
