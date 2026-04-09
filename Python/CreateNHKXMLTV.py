@@ -502,7 +502,17 @@ def main(duration_selection:int|None = None, lang:str = 'en') -> int:
         # Download the EPG JSON for the day, and extract the list of programmes
         epg_date_json_data_list = import_nhk_epg_json(URL_OF_NHK_JSON)["data"]
         
+        # Save the file if debugging
+        if DEBUG:
+            Path(f'./{DEBUG_FOLDER}').mkdir(parents=True, exist_ok=True)
+            with open(f'{DEBUG_FOLDER}/{TEST_NHK_JSON}_{epg_date}_{lang}.json', 'w', encoding="utf-8") as jsonfile:
+                json.dump(epg_date_json_data_list, jsonfile)
             
+            # load the json file from local storage
+            with open(f'{DEBUG_FOLDER}/{TEST_NHK_JSON}_{epg_date}_{lang}.json', 'r', encoding='utf8') as nhkjson:
+                epg_date_json_data_list = json.load(nhkjson)
+        
+        
         # Generate the XMLTV programmes list for this day
         count = 0
         for programme in epg_date_json_data_list:
