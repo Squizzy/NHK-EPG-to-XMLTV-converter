@@ -460,11 +460,30 @@ def get_number_of_days(duration_selection:int|None = None) -> int:
     Returns:
         0: Successful execution
     """
-    json_data: dict = Import_nhk_epg_json(URL_OF_NHK_JSON)
+    nhk_xmltv:xml.Element 
+    # Generate the root
+    nhk_xmltv = generate_xmltv_xml_root()
     
-    if DEBUG:
-        with open(TEST_NHK_JSON, 'w', encoding="utf-8") as jsonfile:
-            json.dump(json_data, jsonfile)
+    # Generate and add the channel description to the root
+    nhk_xmltv = generate_xmltv_xml_channel(nhk_xmltv)  
+    
+    # Generate and add the programmes for the select days to the root
+    for day in range(number_of_days):
+        # format the date
+        epg_date = datetime.strftime(datetime.now(tz=TIMEZONE) + timedelta(days=day), "%Y%m%d")
+        
+        # Select the URI depending on the date and language
+        if lang=='jp':
+            print("japanese version")
+            URL_OF_NHK_JSON:str = f"{URL_OF_NHK_JSON_ROOT_JP}/{epg_date}.json"
+        else:
+            print("english version")
+            URL_OF_NHK_JSON:str = f"{URL_OF_NHK_JSON_ROOT_EN}/{epg_date}.json"
+        print(URL_OF_NHK_JSON)
+        
+        # Download the EPG JSON for the day, and extract the list of programmes
+        epg_date_json_data_list = import_nhk_epg_json(URL_OF_NHK_JSON)["data"]
+        
             
         # load the json file from local storage
         with open(TEST_NHK_JSON, 'r', encoding='utf8') as nhkjson:
