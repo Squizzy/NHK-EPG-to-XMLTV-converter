@@ -424,14 +424,38 @@ def save_xmltv_xml_to_file(root: xml.Element) -> bool:
     """
     # Export the xml to a local file
     tree:xml.ElementTree = xml.ElementTree(root)
-    with open(XMLTV_XML_FILE, 'w+b') as outFile:
-        tree.write(outFile)
+    try:
+        with open(XMLTV_XML_FILE, 'w+b') as outFile:
+            tree.write(outFile)
     
-    print(f"{XMLTV_XML_FILE} created successfully")
-    return True
+        print(f"{XMLTV_XML_FILE} created successfully")
+        return True
+    except IOError as e:
+        print(f"Error writing XMLTV file {XMLTV_XML_FILE}: {e}")
+        return False
 
 
-def main() -> int:
+def get_number_of_days(duration_selection:int|None = None) -> int:
+    """ Determines the number of days of EPG (from today) for the xmltv file 
+    Args:
+        argv (list[str]): the args passed in command line, if any
+    Returns:
+        (int|list[int])
+    """
+    number_of_days_options:dict[int, int] = {0: 0, 1: 1, 2: 2, 3: 7, 4: 14, 5: 28}
+    choice:int = -1
+    if duration_selection:
+        choice = duration_selection
+    
+    while choice not in number_of_days_options.keys():
+        try:
+            choice = int(input("Select: 1 [one day (today)],  2 [two days], 3 [one week], 4 [two weeks], 5 [4 weeks], 0 [exit]: "))
+        except ValueError as e:
+            pass
+    
+    return number_of_days_options[choice]
+
+
     """Main application
     Returns:
         0: Successful execution
@@ -448,7 +472,10 @@ def main() -> int:
 
     XmltvXml: xml.Element = Generate_xmltv_xml(json_data)
     
-    Save_xmltv_xml_to_file(XmltvXml)
+    # Save_xmltv_xml_to_file(XmltvXml)
+    if not save_xmltv_xml_to_file(nhk_xmltv):
+        print("Creation of the XMLTV file failed at saving the file")
+        return 1
     
     return 0
 
