@@ -9,19 +9,27 @@ __maintainer__ = "Squizzy"
 __contributors__ = ["TheDreadPirate"] # TheDreadPirate: https://github.com/solidsnake1298
 
 
+import argparse
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import xml.etree.ElementTree as xml
-import requests # type: ignore
+from xml.etree import ElementTree
+import requests
 import sys
+from pathlib import Path
 # from pprint import pprint
 from icecream import ic
 # from NHK_json_dataclasses import JSONProgramDetails
 
 
+# Will save the downloaded JSON info if enabled, as {DEBUG_FOLDER}/{TEST_NHK_JSON}_<epg_date>_<language>.json
+DEBUG:bool = True
+TEST_NHK_JSON:str = 'DownloadedJSON'
+DEBUG_FOLDER:str = 'debug_samples'
+
+
 XMLTV_SOURCE_INFO_NAME:str = "NHK-EPG-to-XMLTV-converter by Squizzy"
 XMLTV_SOURCE_INFO_URL:str = "https://github.com/Squizzy/NHK-EPG-to-XMLTV-converter"
-
 
 # Location of the NHK EPG JSON to be downloaded.
 # This might need occastional updating
@@ -45,10 +53,6 @@ URL_OF_NHK_CHANNEL_ICON:str = f"{URL_OF_NHK_JAPAN}/nhkworld/assets/images/icon_n
 # Name of the file that is created by this application 
 # which contains the XMLTV XML of the NHK EPG
 XMLTV_XML_FILE:str = 'ConvertedNHK.xml'
-
-# Downloaded JSON file for tests, or created when DEBUG is on
-DEBUG:bool = False
-TEST_NHK_JSON:str = 'DownloadedJSON.json'
 
 # Local time zone that will be used for the timestamps in the XMLTV file
 # Currently set for UTC as for Continental European use
@@ -267,7 +271,7 @@ def generate_xmltv_xml_channel(root:xml.Element) -> xml.Element:
     return root
 
 
-def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}) -> xml.Element:
+def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}, lang:str = 'en') -> xml.Element:
     """ Generates a program for the programs list to add to the root of the XMLTV document 
     Args:
         root (xml.Element): the root to which to add the program
@@ -308,7 +312,7 @@ def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}) -
     Add_xml_element(parent=programme, 
                     tag='episode-num',              
                     attributes={'system': 'onscreen'}, 
-                    text=programme_to_add["epis odeId"][-3:])
+                    text=programme_to_add["episodeId"][-3:])
     
     Add_xml_element(parent=programme, 
                     tag='icon', 
@@ -412,7 +416,7 @@ def Generate_xmltv_xml(nhkimported: dict) -> xml.Element:
     return root
 
 
-def Save_xmltv_xml_to_file(root: xml.Element) -> bool:
+def save_xmltv_xml_to_file(root: xml.Element) -> bool:
     """Store the XML tree to a file
 
     Args:
@@ -447,7 +451,6 @@ def main() -> int:
     Save_xmltv_xml_to_file(XmltvXml)
     
     return 0
-
 
 
 if __name__ == "__main__":
