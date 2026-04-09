@@ -1,6 +1,6 @@
 # NHK EPG to XMLTV converter
 
-Thanks to the research of TheDreadPirate (and others) the application is running again as new NHK URI and format was identified.
+Thanks to the research of [TheDreadPirate](https://github.com/solidsnake1298) (and others) the application is running again as new NHK URI and format was identified.
 
 ## From
 
