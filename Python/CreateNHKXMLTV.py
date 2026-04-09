@@ -454,4 +454,30 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    main()
+
+    usage:str = 'python CreateNHKXMLTV.py [-help] [-period <period>] [-lang <language>] [-debug <debug_status>]\n' + \
+                '\t<period>       (optional): Number of days to generate the NHKTV EPG for, starting today. Interactively asked if not provided.\n' + \
+                '\t<lang>         (optional): language of the EPG to download. only Japanese and English available. Defaults to English.\n' + \
+                '\t<debug_status> (optional): enables debug'
+
+    help_days:str = '1: one day (today), 2: two days, 3: one week, 4: two weeks, 5: 4 weeks. \n'
+    
+    help_lang:str = 'en: English (default), jp: Japanese'
+    
+    help_debug:str = 'True: debug enabled (default), False: debug not enabled'
+
+    parser = argparse.ArgumentParser(
+                            prog='CreateNHKXMLTV',
+                            description="generate XMLTV EPG from NHK's EPG JSON", 
+                            usage=usage, 
+                            add_help=True)
+    parser.add_argument('-period', required=False, type=int,  help=help_days,                choices=[1, 2, 3, 4, 5])
+    parser.add_argument('-lang',   required=False, type=str,  help=help_lang,  default='en', choices=['en', 'jp'])
+    parser.add_argument('-debug',  required=False, type=bool, help=help_debug, default=False)
+
+    args = parser.parse_args()
+
+    if args.debug:
+        DEBUG = args.debug
+        
+    main(duration_selection=args.period, lang=args.lang)
