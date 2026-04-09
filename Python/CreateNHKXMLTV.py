@@ -565,4 +565,4 @@ if __name__ == "__main__":
     if args.debug:
         DEBUG = args.debug
         
-    main(duration_selection=args.period, lang=args.lang)
+    main(duration_selection=args.period, lang=args.lang.lower())
