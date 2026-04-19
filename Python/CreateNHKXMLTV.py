@@ -17,7 +17,7 @@ import requests
 import sys
 from pathlib import Path
 # from pprint import pprint
-from icecream import ic
+#from icecream import ic # typing: ignore
 
 
 # Will save the downloaded JSON info if enabled, as {DEBUG_FOLDER}/{TEST_NHK_JSON}_<epg_date>_<language>.json
@@ -156,7 +156,7 @@ def json_to_xmltv_datetime(json_datetime: str) -> str:
         xmltv_datetime=json_datetime_details.strftime('%Y%m%d%H%M%S')
         
     except Exception as e:
-        print(f"Error converting the json date and time ({json_datetime}) to xmltv format. Aborting.")
+        print(f"Error converting the json date and time ({json_datetime}) to xmltv format: {e}.\n Aborting.")
         exit(1)
         
     return xmltv_datetime
@@ -177,7 +177,7 @@ def duration_in_mins(json_start_time:str, json_end_time:str) -> int:
         duration = abs(int((end_time - start_time)/60))
         
     except Exception as e:
-        print(f"Error converting the json date and time ({start_time} or {end_time}) to calculate the duration. skipping.")
+        print(f"Error converting the json date and time ({start_time} or {end_time}) to calculate the duration: {e}.\n skipping.")
         
     return duration
     
@@ -281,7 +281,7 @@ def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}, l
         print("No root xml element provided to add the program to. Aborting.")
         exit(1)
     
-    if programme_to_add is {}:
+    if programme_to_add == {}:
         print("no program info to process and add to the xmltv. Skipping.")
         return root
     
@@ -453,7 +453,7 @@ def get_number_of_days(duration_selection:int|None = None) -> int:
     while choice not in number_of_days_options.keys():
         try:
             choice = int(input("Select: 1 [one day (today)],  2 [two days], 3 [one week], 4 [two weeks], 5 [4 weeks], 0 [exit]: "))
-        except ValueError as e:
+        except ValueError:
             pass
     
     return number_of_days_options[choice]
@@ -498,12 +498,13 @@ def main(duration_selection:int|None = None, lang:str = 'en') -> int:
         epg_date = datetime.strftime(datetime.now(tz=TIMEZONE) + timedelta(days=day), "%Y%m%d")
         
         # Select the URI depending on the date and language
+        URL_OF_NHK_JSON:str
         if lang=='jp':
             print("japanese version")
-            URL_OF_NHK_JSON:str = f"{URL_OF_NHK_JSON_ROOT_JP}/{epg_date}.json"
+            URL_OF_NHK_JSON = f"{URL_OF_NHK_JSON_ROOT_JP}/{epg_date}.json"
         else:
             print("english version")
-            URL_OF_NHK_JSON:str = f"{URL_OF_NHK_JSON_ROOT_EN}/{epg_date}.json"
+            URL_OF_NHK_JSON = f"{URL_OF_NHK_JSON_ROOT_EN}/{epg_date}.json"
         print(URL_OF_NHK_JSON)
         
         # Download the EPG JSON for the day, and extract the list of programmes
