@@ -58,7 +58,7 @@ TIMEZONE:timezone = timezone.utc
 
 # In case the time offset is incorrect in the XMLTV file, the value below 
 # can be modified to adjust it: For example -0100 would change to -1 UTC
-TIME_OFFSET:str = ' +0000'
+TIME_OFFSET:str = '+0000'
 
 
 # Genres from NHK network
@@ -289,8 +289,8 @@ def generate_xmltv_xml_programme(root:xml.Element, programme_to_add:dict = {}, l
     programme:xml.Element = add_xml_element(
                                 parent=root, 
                                 tag='programme', 
-                                attributes={'start': json_to_xmltv_datetime(programme_to_add["startTime"]) + TIME_OFFSET,
-                                            'stop' : json_to_xmltv_datetime(programme_to_add["endTime"]) + TIME_OFFSET,
+                                attributes={'start': f'{json_to_xmltv_datetime(programme_to_add["startTime"]).strip()} {TIME_OFFSET.strip()}',
+                                            'stop' : f'{json_to_xmltv_datetime(programme_to_add["endTime"]).strip()} {TIME_OFFSET.strip()}',
                                             'channel':'nhk-world'})
 
     add_xml_element(parent=programme, 
@@ -377,8 +377,8 @@ def Generate_xmltv_xml(nhkimported: dict) -> xml.Element:
         programme: xml.Element = add_xml_element(
                                     root, 
                                     'programme', 
-                                    attributes={'start': json_to_xmltv_datetime(programme_to_add["pubDate"]) + TIME_OFFSET, 
-                                                'stop': json_to_xmltv_datetime(programme_to_add["endDate"]) + TIME_OFFSET, 
+                                    attributes={'start': f'{json_to_xmltv_datetime(programme_to_add["pubDate"]).strip()} {TIME_OFFSET.strip()}', 
+                                                'stop': f'{json_to_xmltv_datetime(programme_to_add["endDate"]).strip()} {TIME_OFFSET.strip()}', 
                                                 'channel':'nhk.world'})
 
         add_xml_element(programme, 'title', attributes={'lang': 'en'}, text=programme_to_add["title"])
