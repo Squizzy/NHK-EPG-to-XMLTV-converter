@@ -8,5 +8,5 @@ Python/build/
 Python/dist/
 Python/CreateNHKXMLTV.spec
 Python/scrape_nhk_genres.spec
-Python/ConvertedNHK.xml
-Python/debug_samples
+ConvertedNHK.xml
+debug_samples/
